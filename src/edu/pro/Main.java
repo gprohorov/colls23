@@ -3,61 +3,26 @@ package edu.pro;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Locale;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+        LocalDateTime start = LocalDateTime.now();
         String content = new String(Files.readAllBytes(Paths.get("/home/george/Desktop/harry.txt")));
-        content = content.replaceAll("[^A-Za-z ]", " ").toLowerCase(Locale.ROOT);
-
-        String[] words = content.split(" +");
-        Arrays.sort(words);
-
-    for (int i = 0; i < 30; i++) {
-    //  System.out.println(i + "." + words[i]);
-    }
-
-    String distinctsAsString = "";
-
-    for (int i = 0; i < words.length; i++) {
-      if (!distinctsAsString.contains(words[i])) {
-          distinctsAsString += words[i] + " ";
-      }
-    }
-
-    System.out.println(distinctsAsString.substring(0, 100));
-
-        String[] distinctsArray = distinctsAsString.split(" ");
-
-        for (int i = 0; i < 10; i++) {
-       //       System.out.println(i + "." + distinctsArray[i]);
-        }
-
-        int[] frequency = new int[distinctsArray.length];
-
-    for (int i = 0; i < distinctsArray.length; i++) {
-         int count = 0;
-      for (int j = 0; j < words.length; j++) {
-        if (distinctsArray[i].equals(words[j])) {
-            count++;
-        }
-        frequency[i] = count;
-      }
-    }
-
-    for (int i = 0; i < 100; i++) {
-      System.out.println( distinctsArray[i] + " - " + frequency[i]);
-    }
-
-   Arrays.sort(frequency);
-
-    for (int i = 0; i < 10; i++) {
-      System.out.println(frequency[frequency.length -1 -i]);
-    }
+        Map<String, Long> sortedMap = new LinkedHashMap<>();
+        Arrays.stream(content.replaceAll("[^A-Za-z ]", " ").toLowerCase(Locale.ROOT).split(" +"))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())).entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .forEachOrdered(entry -> sortedMap.put(entry.getKey(), entry.getValue()));
+    sortedMap.entrySet().stream().limit(10).forEach(System.out::println);
+    LocalDateTime finish = LocalDateTime.now();
+    System.out.println(ChronoUnit.MILLIS.between(start, finish));
     }
 }
 
